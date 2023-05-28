@@ -1,11 +1,11 @@
-const Rank = () => {
+const Rank = ({entries, name}) => {
   return (
     <div className="flex-column">
       <div className='center white f3'>
-        {`Ray , your current entry count is...`}
+        {`${name} , your current entry count is...`}
       </div>
       <div className='center white f1'>
-        { `#5`}
+        { entries}
       </div>
     </div>
   )

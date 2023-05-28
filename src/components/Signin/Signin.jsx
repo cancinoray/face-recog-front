@@ -1,4 +1,36 @@
-const Signin = ({handleRoute}) => {
+import { useEffect, useState } from "react"
+
+const Signin = ({handleRoute, loadUser}) => {
+  const [signEmail, setEmail] = useState('')
+  const [signPassword, setPassword] = useState('')
+  
+  const handleEmail = (event) => {
+    setEmail(event.target.value)
+  }
+
+  const handlePassword = (event) => {
+    setPassword(event.target.value)
+  }
+
+  const handleSubmit = async () => {
+    fetch('http://localhost:3000/signin', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: signEmail,
+        password: signPassword
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if(data.id){
+          loadUser(data)
+          handleRoute('home')
+        }
+      })
+      .catch(err => console.log(err))
+  }
+
   return (
     <article className="br3 ba b--white mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
         <main className="pa4 black-80 center">
@@ -12,7 +44,7 @@ const Signin = ({handleRoute}) => {
                   type="email"
                   name="email-address"
                   id="email-address"
-                  // onChange={this.onEmailChange}
+                  onChange={handleEmail}
                 />
               </div>
               <div className="mv3 center flex-column">
@@ -22,13 +54,13 @@ const Signin = ({handleRoute}) => {
                   type="password"
                   name="password"
                   id="password"
-                  // onChange={this.onPasswordChange}
+                  onChange={handlePassword}
                 />
               </div>
             </div>
             <div className="center">
               <input
-                onClick={() => handleRoute('home')}
+                onClick={handleSubmit}
                 className="b ph3 pv2 input-reset ba b--white near-white bg-transparent grow pointer f6 dib"
                 type="submit"
                 value="Sign in"

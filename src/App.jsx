@@ -8,7 +8,7 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm'
 import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 import './App.css'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 //You must add your own API key here from Clarifai.
 // const app = new Clarifai.App({
@@ -60,6 +60,24 @@ const App = () =>  {
   const [box, setBox] = useState({})
   const [route, setRoute] = useState('signin')
   const [isSignedIn, setSignedIn] = useState(false)
+  const [users, setUsers] = useState({
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: new Date()
+  })
+
+  const loadUser = (data) => {
+    setUsers({
+      ...users,
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+      })
+  }
 
   const calculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
@@ -86,10 +104,29 @@ const App = () =>  {
   const handleSubmit = () => {
     console.log('click')
     setImageUrl(input);
-    // app.models.predict('face-detection')
     fetch("https://api.clarifai.com/v2/models/" + 'face-detection' + "/outputs",returnClarifaiJSONRequestOptions(input))
-      .then(response => response.json())
-      .then(response => displayFaceBox(calculateFaceLocation(response)) )
+      .then(response => response.json())  
+      .then(response => {
+        // console.log(response, 'response')
+        if (response) {
+          console.log(users.id, 'id')
+          fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              id: users.id
+            })
+          })
+          .then(response => response.json())
+          .then(count => {
+            setUsers({
+              ...users, 
+              entries: count
+            })
+          })
+        }
+        displayFaceBox(calculateFaceLocation(response))
+      }) 
       .catch(err => console.log(err))
   }
 
@@ -109,14 +146,14 @@ const App = () =>  {
     { route === 'home'
         ? <div>
             <Logo />
-            <Rank />
+            <Rank entries={users.entries} name={users.name} />
             <ImageLinkForm handleInputChange={handleInputChange} handleSubmit={handleSubmit} />
             <FaceRecognition imageUrl={imageUrl} box={box} />
           </div>
         : (
             route === 'signin'
-            ? <Signin handleRoute={handleRoute}/>
-            : <Register />
+            ? <Signin handleRoute={handleRoute} loadUser={loadUser} />
+            : <Register handleRoute={handleRoute} loadUser={loadUser} />
             
         )
     }

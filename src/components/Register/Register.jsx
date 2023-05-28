@@ -1,4 +1,42 @@
-const Register = ({handleRoute}) => {
+import { useState } from "react"
+
+const Register = ({handleRoute, loadUser}) => {
+  const [regEmail, setEmail] = useState('')
+  const [regPassword, setPassword] = useState('')
+  const [regName, setName] = useState('')
+
+  const handleRegEmail = (event) => {
+    setEmail(event.target.value)
+  }
+
+  const handleRegPassword = (event) => {
+    setPassword(event.target.value)
+  }
+
+  const handleRegName = (event) => {
+    setName(event.target.value)
+  }
+
+  const handleRegisterNewUser = async () => {
+    fetch('http://localhost:3000/register', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: regEmail,
+        password: regPassword,
+        name: regName
+      })
+    })
+      .then(response => response.json())
+      .then(user => {
+        if(user) {
+          loadUser(user)
+          handleRoute('home')
+        }
+      })
+      .catch(err => console.log(err))
+  }
+  
   return (
     <article className="br3 ba b--white mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
         <main className="pa4 black-80 center near-white">
@@ -12,7 +50,7 @@ const Register = ({handleRoute}) => {
                 type="text"
                 name="name"
                 id="name"
-                // onChange={this.onEmailChange}
+                onChange={handleRegName}
               />
             </div>
               <div className="mt3 center flex-column">
@@ -22,7 +60,7 @@ const Register = ({handleRoute}) => {
                   type="email"
                   name="email-address"
                   id="email-address"
-                  // onChange={this.onEmailChange}
+                  onChange={handleRegEmail}
                 />
               </div>
               <div className="mv3 center flex-column">
@@ -32,13 +70,13 @@ const Register = ({handleRoute}) => {
                   type="password"
                   name="password"
                   id="password"
-                  // onChange={this.onPasswordChange}
+                  onChange={handleRegPassword}
                 />
               </div>
             </div>
             <div className="center">
               <input
-                onClick={() => handleRoute('home')}
+                onClick={handleRegisterNewUser}
                 className="b ph3 pv2 input-reset ba b--white bg-transparent grow pointer f6 dib near-white"
                 type="submit"
                 value="Register"
