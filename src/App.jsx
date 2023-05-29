@@ -8,51 +8,54 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm'
 import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 import './App.css'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useReducer } from 'react'
 
 //You must add your own API key here from Clarifai.
 // const app = new Clarifai.App({
 //   apiKey: '62230478be5c4f76a800730b86e5f433'
 // });
 
-const returnClarifaiJSONRequestOptions = (imageUrl) => {
-  // Your PAT (Personal Access Token) can be found in the portal under Authentification
-  const PAT = '159396279dbd41e19b3cc8ed467839ea';
-  // Specify the correct user_id/app_id pairings
-  // Since you're making inferences outside your app's scope
-  const USER_ID = 'sy1pzx55u3oe';       
-  const APP_ID = 'face-recog-v2';
-  // Change these to whatever model and image URL you want to use
-  const MODEL_ID = 'face-detection';  
-  const IMAGE_URL = imageUrl;
+// const returnClarifaiJSONRequestOptions = (imageUrl) => {
+//   // Your PAT (Personal Access Token) can be found in the portal under Authentification
+//   const PAT = '159396279dbd41e19b3cc8ed467839ea';
+//   // Specify the correct user_id/app_id pairings
+//   // Since you're making inferences outside your app's scope
+//   const USER_ID = 'sy1pzx55u3oe';       
+//   const APP_ID = 'face-recog-v2';
+//   // Change these to whatever model and image URL you want to use
+//   const MODEL_ID = 'face-detection';  
+//   const IMAGE_URL = imageUrl;
 
-  const  raw = JSON.stringify({
-      "user_app_id": {
-          "user_id": USER_ID,
-          "app_id": APP_ID
-      },
-      "inputs": [
-          {
-              "data": {
-                  "image": {
-                      "url": IMAGE_URL
-                  }
-              }
-          }
-      ]
-  });
+//   const  raw = JSON.stringify({
+//       "user_app_id": {
+//           "user_id": USER_ID,
+//           "app_id": APP_ID
+//       },
+//       "inputs": [
+//           {
+//               "data": {
+//                   "image": {
+//                       "url": IMAGE_URL
+//                   }
+//               }
+//           }
+//       ]
+//   });
 
-  const requestOptions = {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Key ' + PAT
-      },
-      body: raw
-  };
+//   const requestOptions = {
+//       method: 'POST',
+//       headers: {
+//           'Accept': 'application/json',
+//           'Authorization': 'Key ' + PAT
+//       },
+//       body: raw
+//   };
 
-  return requestOptions;
-}
+//   return requestOptions;
+// }
+
+
+
 
 const App = () =>  {
   const [input, setInput] = useState('')
@@ -102,13 +105,19 @@ const App = () =>  {
   }
 
   const handleSubmit = () => {
-    console.log('click')
     setImageUrl(input);
-    fetch("https://api.clarifai.com/v2/models/" + 'face-detection' + "/outputs",returnClarifaiJSONRequestOptions(input))
+      fetch('http://localhost:3000/imageurl', {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          input
+        })
+      })
       .then(response => response.json())  
       .then(response => {
         // console.log(response, 'response')
         if (response) {
+          console.log(response, 'response')
           console.log(users.id, 'id')
           fetch('http://localhost:3000/image', {
             method: 'put',
@@ -121,9 +130,10 @@ const App = () =>  {
           .then(count => {
             setUsers({
               ...users, 
-              entries: count
+              entries: count 
             })
           })
+          .catch(console.error)
         }
         displayFaceBox(calculateFaceLocation(response))
       }) 
@@ -132,7 +142,18 @@ const App = () =>  {
 
   const handleRoute = (route) => {
     if( route === 'signout') {
-      setSignedIn(false)
+      setInput('');
+      setImageUrl('');
+      setBox({});
+      setRoute('signin');
+      setSignedIn(false);
+      setUsers({
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: new Date()
+      })
     } else if (route === 'home') {
     setSignedIn(true)
     }
