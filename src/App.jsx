@@ -1,5 +1,4 @@
 import ParticlesBg from 'particles-bg'
-// import Clarifai from 'clarifai'
 import Navigation from './components/Navigation/Navigation'
 import Signin from './components/Signin/Signin'
 import Register from './components/Register/Register'
@@ -8,7 +7,7 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm'
 import Rank from './components/Rank/Rank'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 import './App.css'
-import { useEffect, useState, useReducer } from 'react'
+import { useState } from 'react'
 
 const App = () =>  {
   const [input, setInput] = useState('')
@@ -68,7 +67,6 @@ const App = () =>  {
       })
       .then(response => response.json())  
       .then(response => {
-        // console.log(response, 'response')
         if (response) {
           console.log(response, 'response')
           console.log(users.id, 'id')
