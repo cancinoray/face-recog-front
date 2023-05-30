@@ -18,7 +18,7 @@ const Register = ({handleRoute, loadUser}) => {
   }
 
   const handleRegisterNewUser = async () => {
-    fetch('http://localhost:3000/register', {
+    fetch('https://face-recog-api.onrender.com/register', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({

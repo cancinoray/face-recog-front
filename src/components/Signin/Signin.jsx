@@ -13,7 +13,7 @@ const Signin = ({handleRoute, loadUser}) => {
   }
 
   const handleSubmit = async () => {
-    fetch('http://localhost:3000/signin', {
+    fetch('https://face-recog-api.onrender.com/signin', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({

@@ -10,53 +10,6 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 import './App.css'
 import { useEffect, useState, useReducer } from 'react'
 
-//You must add your own API key here from Clarifai.
-// const app = new Clarifai.App({
-//   apiKey: '62230478be5c4f76a800730b86e5f433'
-// });
-
-// const returnClarifaiJSONRequestOptions = (imageUrl) => {
-//   // Your PAT (Personal Access Token) can be found in the portal under Authentification
-//   const PAT = '159396279dbd41e19b3cc8ed467839ea';
-//   // Specify the correct user_id/app_id pairings
-//   // Since you're making inferences outside your app's scope
-//   const USER_ID = 'sy1pzx55u3oe';       
-//   const APP_ID = 'face-recog-v2';
-//   // Change these to whatever model and image URL you want to use
-//   const MODEL_ID = 'face-detection';  
-//   const IMAGE_URL = imageUrl;
-
-//   const  raw = JSON.stringify({
-//       "user_app_id": {
-//           "user_id": USER_ID,
-//           "app_id": APP_ID
-//       },
-//       "inputs": [
-//           {
-//               "data": {
-//                   "image": {
-//                       "url": IMAGE_URL
-//                   }
-//               }
-//           }
-//       ]
-//   });
-
-//   const requestOptions = {
-//       method: 'POST',
-//       headers: {
-//           'Accept': 'application/json',
-//           'Authorization': 'Key ' + PAT
-//       },
-//       body: raw
-//   };
-
-//   return requestOptions;
-// }
-
-
-
-
 const App = () =>  {
   const [input, setInput] = useState('')
   const [imageUrl, setImageUrl] = useState('')
@@ -106,7 +59,7 @@ const App = () =>  {
 
   const handleSubmit = () => {
     setImageUrl(input);
-      fetch('http://localhost:3000/imageurl', {
+      fetch('https://face-recog-api.onrender.com/imageurl', {
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -119,7 +72,7 @@ const App = () =>  {
         if (response) {
           console.log(response, 'response')
           console.log(users.id, 'id')
-          fetch('http://localhost:3000/image', {
+          fetch('https://face-recog-api.onrender.com/image', {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
