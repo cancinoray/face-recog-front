@@ -12,7 +12,7 @@ import { useState } from 'react'
 const App = () =>  {
   const [input, setInput] = useState('')
   const [imageUrl, setImageUrl] = useState('')
-  const [box, setBox] = useState({})
+  const [boxes, setBoxes] = useState([])
   const [route, setRoute] = useState('signin')
   const [isSignedIn, setSignedIn] = useState(false)
   const [users, setUsers] = useState({
@@ -34,22 +34,23 @@ const App = () =>  {
       })
   }
 
-  const calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputimage');
-    const width = Number(image.width);
-    const height = Number(image.height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
-    }
+  const calculateFaceLocations = (data) => {
+    return data.outputs[0].data.regions.map(face => {
+      const clarifaiFace = face.region_info.bounding_box;
+      const image = document.getElementById('inputimage');
+      const width = Number(image.width);
+      const height = Number(image.height);
+      return {
+        leftCol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_row * height,
+        rightCol: width - (clarifaiFace.right_col * width),
+        bottomRow: height - (clarifaiFace.bottom_row * height)
+      }
+    })
   }
 
-  const displayFaceBox = (box) => {
-    setBox(box)
-    console.log(box)
+  const displayFaceBoxes = (boxes) => {
+    setBoxes(boxes)
   }
 
   const handleInputChange = (event) => {
@@ -86,7 +87,8 @@ const App = () =>  {
           })
           .catch(console.error)
         }
-        displayFaceBox(calculateFaceLocation(response))
+        console.log(response, 'response')
+        displayFaceBoxes(calculateFaceLocations(response))
       }) 
       .catch(err => console.log(err))
   }
@@ -95,7 +97,7 @@ const App = () =>  {
     if( route === 'signout') {
       setInput('');
       setImageUrl('');
-      setBox({});
+      setBoxes([]);
       setRoute('signin');
       setSignedIn(false);
       setUsers({
@@ -120,7 +122,7 @@ const App = () =>  {
             <Logo />
             <Rank entries={users.entries} name={users.name} />
             <ImageLinkForm handleInputChange={handleInputChange} handleSubmit={handleSubmit} />
-            <FaceRecognition imageUrl={imageUrl} box={box} />
+            <FaceRecognition imageUrl={imageUrl} boxes={boxes} />
           </div>
         : (
             route === 'signin'
